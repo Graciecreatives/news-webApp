@@ -24,27 +24,49 @@ const NewsFeed = () => {
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
 
+  
+  // Client-side API key (Vite). Used as a fallback when `/api/news` isn't available locally.
   const apiKey = import.meta.env.VITE_NEWS_API_KEY;
 
-  /** FETCH NEWS */
+  /** FETCH NEWS FROM SERVERLESS FUNCTION (with direct-NewsAPI fallback) */
   const fetchNews = useCallback(async () => {
     setLoading(true);
     setError("");
 
+    // first try: serverless endpoint (deployed platforms like Vercel expose /api/*)
     try {
-      const url = `https://newsapi.org/v2/top-headlines?country=us&category=${category}&q=${query || ""}&apiKey=${apiKey}`;
+      const url = `/api/news?category=${category}&query=${encodeURIComponent(query || "")}`;
       const response = await axios.get(url);
-
-      const all = response.data.articles || [];
+      const all = response.data?.articles || [];
       setHeroArticle(all[0] || null);
       setArticles(all.length > 1 ? all.slice(1) : []);
+      setLoading(false);
+      return;
     } catch (err) {
-      setError("Failed to fetch news articles.");
-      console.error(err);
+      console.warn("/api/news failed, will try direct NewsAPI if key available:", err?.message || err);
+    }
+
+    // fallback: call NewsAPI directly from the client (needs VITE_NEWS_API_KEY set)
+    if (apiKey) {
+      try {
+        const directUrl = `https://newsapi.org/v2/top-headlines?country=us&category=${category}&q=${encodeURIComponent(
+          query || ""
+        )}&apiKey=${apiKey}`;
+        const resp = await axios.get(directUrl);
+        const all = resp.data?.articles || [];
+        setHeroArticle(all[0] || null);
+        setArticles(all.length > 1 ? all.slice(1) : []);
+      } catch (err2) {
+        console.error("Direct NewsAPI fetch failed:", err2.response?.data || err2.message || err2);
+        setError("Failed to fetch news articles (direct). Check your API key or network.");
+      }
+    } else {
+      setError("Failed to fetch news articles. Backend unavailable and no NewsAPI key provided.");
     }
 
     setLoading(false);
   }, [category, query, apiKey]);
+
 
   useEffect(() => {
     fetchNews();

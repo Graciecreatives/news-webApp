@@ -15,3 +15,8 @@ build/
 *.log
 
 repo-backup/
+
+.vercel
+
+# local dev server
+dev-server.js

@@ -1,0 +1,26 @@
+{
+  "status": "ok",
+  "totalResults": 2,
+  "articles": [
+    {
+      "source": { "id": null, "name": "Mock Source" },
+      "author": "Mock Author",
+      "title": "Sample Article One",
+      "description": "This is a sample news article used for local development when no API key is available.",
+      "url": "https://example.com/sample-article-1",
+      "urlToImage": "/placeholder.jpg",
+      "publishedAt": "2025-11-17T00:00:00Z",
+      "content": "Full sample article content goes here."
+    },
+    {
+      "source": { "id": null, "name": "Mock Source" },
+      "author": "Mock Author",
+      "title": "Sample Article Two",
+      "description": "Another sample article for UI development and testing.",
+      "url": "https://example.com/sample-article-2",
+      "urlToImage": "/placeholder.jpg",
+      "publishedAt": "2025-11-16T00:00:00Z",
+      "content": "More sample content."
+    }
+  ]
+}
